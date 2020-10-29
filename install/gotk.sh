@@ -68,10 +68,10 @@ verify_downloader() {
 
 # Create tempory directory and cleanup when done
 setup_tmp() {
-    TMP_DIR=$(mktemp -d -t gotk-install.XXXXXXXXXX)
-    TMP_METADATA="${TMP_DIR}/gotk.json"
-    TMP_HASH="${TMP_DIR}/gotk.hash"
-    TMP_BIN="${TMP_DIR}/gotk.tar.gz"
+    TMP_DIR=$(mktemp -d -t flux-install.XXXXXXXXXX)
+    TMP_METADATA="${TMP_DIR}/flux.json"
+    TMP_HASH="${TMP_DIR}/flux.hash"
+    TMP_BIN="${TMP_DIR}/flux.tar.gz"
     cleanup() {
         code=$?
         set +e
@@ -89,9 +89,9 @@ get_release_version() {
     info "Downloading metadata ${METADATA_URL}"
     download "${TMP_METADATA}" "${METADATA_URL}"
 
-    VERSION_GOTK=$(grep '"tag_name":' "${TMP_METADATA}" | sed -E 's/.*"([^"]+)".*/\1/' | cut -c 2-)
-    if [[ -n "${VERSION_GOTK}" ]]; then
-        info "Using ${VERSION_GOTK} as release"
+    VERSION_flux=$(grep '"tag_name":' "${TMP_METADATA}" | sed -E 's/.*"([^"]+)".*/\1/' | cut -c 2-)
+    if [[ -n "${VERSION_flux}" ]]; then
+        info "Using ${VERSION_flux} as release"
     else
         fatal "Unable to determine release version"
     fi
@@ -119,16 +119,16 @@ download() {
 
 # Download hash from Github URL
 download_hash() {
-    HASH_URL="https://github.com/${GITHUB_REPO}/releases/download/v${VERSION_GOTK}/toolkit_${VERSION_GOTK}_checksums.txt"
+    HASH_URL="https://github.com/${GITHUB_REPO}/releases/download/v${VERSION_flux}/toolkit_${VERSION_flux}_checksums.txt"
     info "Downloading hash ${HASH_URL}"
     download "${TMP_HASH}" "${HASH_URL}"
-    HASH_EXPECTED=$(grep " gotk_${VERSION_GOTK}_${OS}_${ARCH}.tar.gz$" "${TMP_HASH}")
+    HASH_EXPECTED=$(grep " flux_${VERSION_flux}_${OS}_${ARCH}.tar.gz$" "${TMP_HASH}")
     HASH_EXPECTED=${HASH_EXPECTED%%[[:blank:]]*}
 }
 
 # Download binary from Github URL
 download_binary() {
-    BIN_URL="https://github.com/${GITHUB_REPO}/releases/download/v${VERSION_GOTK}/gotk_${VERSION_GOTK}_${OS}_${ARCH}.tar.gz"
+    BIN_URL="https://github.com/${GITHUB_REPO}/releases/download/v${VERSION_flux}/flux_${VERSION_flux}_${OS}_${ARCH}.tar.gz"
     info "Downloading binary ${BIN_URL}"
     download "${TMP_BIN}" "${BIN_URL}"
 }
@@ -161,10 +161,10 @@ verify_binary() {
 # Setup permissions and move binary
 setup_binary() {
     chmod 755 "${TMP_BIN}"
-    info "Installing gotk to ${BIN_DIR}/gotk"
+    info "Installing flux to ${BIN_DIR}/flux"
     tar -xzf "${TMP_BIN}" -C "${TMP_DIR}"
 
-    local CMD_MOVE="mv -f \"${TMP_DIR}/gotk\" \"${BIN_DIR}\""
+    local CMD_MOVE="mv -f \"${TMP_DIR}/flux\" \"${BIN_DIR}\""
     if [[ -w "${BIN_DIR}" ]]; then
         eval "${CMD_MOVE}"
     else
